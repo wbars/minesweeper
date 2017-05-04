@@ -169,4 +169,16 @@ public class Board {
     public int minesCount(int i, int j) {
         return cells[i][j].minesCount();
     }
+
+    public boolean toggleFlag(int i, int j) {
+        if (isFlag(i, j)) cells[i][j].state(Cell.State.CLOSED);
+        else if (cells[i][j].state() == Cell.State.CLOSED) cells[i][j].state(Cell.State.FLAG);
+        else throw new IllegalArgumentException();
+
+        return isFlag(i, j);
+    }
+
+    public boolean isFlag(int i, int j) {
+        return cells[i][j].state() == Cell.State.FLAG;
+    }
 }
