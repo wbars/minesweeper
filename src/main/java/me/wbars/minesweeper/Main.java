@@ -8,7 +8,18 @@ import java.awt.event.WindowEvent;
 
 public class Main {
     public static void main(String[] args) {
+        initSystemProperties();
         SwingUtilities.invokeLater(Main::createAndShowGUI);
+    }
+
+    private static void initSystemProperties() {
+        try {
+            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Minesweeper");
+            System.setProperty("com.apple.macos.useScreenMenuBar", "true");
+            System.setProperty("apple.laf.useScreenMenuBar", "true"); // for older versions of Java
+        } catch (SecurityException unused) {
+            /* probably running via webstart, do nothing */
+        }
     }
 
     private static void createAndShowGUI() {
