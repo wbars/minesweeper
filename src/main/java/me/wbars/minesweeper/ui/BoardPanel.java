@@ -3,7 +3,6 @@ package me.wbars.minesweeper.ui;
 import me.wbars.minesweeper.core.Board;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
@@ -14,6 +13,8 @@ import java.awt.event.MouseMotionAdapter;
 import static javax.swing.Box.createHorizontalGlue;
 
 public class BoardPanel extends JPanel {
+    private final MyCounter timerPanel = new MyCounter();
+    private final MyCounter flagsPanel = new MyCounter();
     private int rows;
     private int cols;
     private final int minesCount;
@@ -25,11 +26,9 @@ public class BoardPanel extends JPanel {
     private int cellSize = 30;
     private JPanel topPanel;
     private int flagsRemain;
-    private Timer timer;
 
-    private JLabel timerLabel = new JLabel();
+    private Timer timer;
     private long start;
-    private JLabel flagsCounter = new JLabel();
 
     public BoardPanel(int rows, int cols, int minesCount) {
         this.rows = rows;
@@ -44,15 +43,6 @@ public class BoardPanel extends JPanel {
         board = Board.create(cols, rows, minesCount);
         table = initTable(rows, cols);
         add(table);
-
-        initLabelsStyles();
-    }
-
-    private void initLabelsStyles() {
-        flagsCounter.setBorder(new EmptyBorder(0, 0, 0, 12));
-        timerLabel.setBorder(new EmptyBorder(0, 12, 0, 0));
-        timerLabel.setFont(new Font(timerLabel.getFont().getName(), Font.PLAIN, 16));
-        flagsCounter.setFont(new Font(flagsCounter.getFont().getName(), Font.PLAIN, 16));
     }
 
     private JPanel initTopPanel() {
@@ -60,27 +50,22 @@ public class BoardPanel extends JPanel {
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
 
         initTimer();
-        topPanel.add(timerLabel);
+        topPanel.add(timerPanel);
         topPanel.add(createHorizontalGlue());
         resetButton = resetButtonInit(minesCount);
         topPanel.add(resetButton);
         topPanel.add(createHorizontalGlue());
-        topPanel.add(flagsCounter);
-        flagsCounter.setText(String.valueOf(flagsRemain));
+
+        restartFlagsCounter();
+        topPanel.add(flagsPanel);
         return topPanel;
     }
 
     private void initTimer() {
-        timer = new Timer(0, e -> timerLabel.setText(format(e.getWhen() - start)));
+        timer = new Timer(0, e -> timerPanel.setValue((float) ((e.getWhen() - start) * 1.0 / 1000)));
         timer.setDelay(50);
         start = System.currentTimeMillis();
         timer.start();
-    }
-
-    private static String format(long time) {
-        long seconds = (time / 1000) % 60;
-        long remainMillis = Math.max(time - seconds * 60, 0) / 10;
-        return String.format("%d.%02d", seconds, remainMillis);
     }
 
     private JButton resetButtonInit(int minesCount) {
@@ -98,7 +83,7 @@ public class BoardPanel extends JPanel {
 
     private void restartFlagsCounter() {
         flagsRemain = minesCount;
-        flagsCounter.setText(String.valueOf(flagsRemain));
+        flagsPanel.setValue(flagsRemain);
     }
 
     private void restartTimer() {
@@ -144,7 +129,7 @@ public class BoardPanel extends JPanel {
                 boolean newValue = board.toggleFlag(i, j);
                 if (newValue) flagsRemain--;
                 else flagsRemain++;
-                flagsCounter.setText(String.valueOf(flagsRemain));
+                flagsPanel.setValue(flagsRemain);
 
                 if (board.isWin()) {
                     timer.stop();
