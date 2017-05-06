@@ -174,9 +174,28 @@ public class BoardPanel extends JPanel {
     }
 
     public class AttributiveCellRenderer extends JLabel implements TableCellRenderer {
+        private Color background = Color.gray;
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            GradientPaint gp = new GradientPaint(0, 0, background.brighter(), 0, getHeight(), background);
+
+            g2d.setPaint(gp);
+            g2d.fillRect(0, 0, getWidth(), getHeight());
+
+            super.paintComponent(g);
+        }
 
         public AttributiveCellRenderer() {
             setOpaque(true);
+        }
+
+        @Override
+        public boolean isOpaque() {
+            return false;
         }
 
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -184,17 +203,17 @@ public class BoardPanel extends JPanel {
             if (board.isFlag(row, column)) this.setText("F");
 
             if (!board.isOpen(row, column)) {
-                if (row == selectedRow && column == selectedCol) this.setBackground(Color.gray);
-                else this.setBackground(Color.lightGray);
+                if (row == selectedRow && column == selectedCol) background = Color.gray;
+                else background = Color.lightGray;
                 return this;
             }
 
             if (board.isMine(row, column)) {
-                this.setBackground(Color.red);
+                background = Color.red;
                 return this;
             }
 
-            this.setBackground(Color.gray);
+            background = Color.gray;
             if (board.minesCount(row, column) > 0) {
                 this.setForeground(getColor(board.minesCount(row, column)));
                 this.setText(String.valueOf(board.minesCount(row, column)));
