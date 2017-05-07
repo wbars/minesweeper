@@ -9,12 +9,17 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
+import java.net.URL;
 
 import static javax.swing.Box.createHorizontalGlue;
 
 public class BoardPanel extends JPanel {
     private final MyCounter timerPanel = new MyCounter();
     private final MyCounter flagsPanel = new MyCounter();
+    private final ImageIcon upsetIcon = getImageIcon("images/upset.png");
+    private final ImageIcon sadIcon = getImageIcon("images/sad.png");
+    private final ImageIcon smileIcon = getImageIcon("images/smile.png");
+    private final ImageIcon surpriseIcon = getImageIcon("images/surprised.png");
     private int rows;
     private int cols;
     private final int minesCount;
@@ -68,9 +73,45 @@ public class BoardPanel extends JPanel {
         timer.start();
     }
 
+    private URL getImage(String path) {
+        return getClass().getClassLoader().getResource(path);
+    }
+
     private JButton resetButtonInit(int minesCount) {
-        JButton resetButton = new JButton("Reset");
-        resetButton.addActionListener(e -> {
+        JButton button = new JButton(smileIcon);
+
+        button.setMaximumSize(new Dimension(30, 30));
+        button.setOpaque(false);
+        button.setContentAreaFilled(false);
+
+        button.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                button.setIcon(surpriseIcon);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                button.setIcon(smileIcon);
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
+
+        button.addActionListener(e -> {
             board = Board.create(this.cols, this.rows, minesCount);
             ((DefaultTableModel) table.getModel()).setRowCount(rows);
             ((DefaultTableModel) table.getModel()).setColumnCount(cols);
@@ -78,7 +119,15 @@ public class BoardPanel extends JPanel {
             restartFlagsCounter();
             table.repaint();
         });
-        return resetButton;
+        return button;
+    }
+
+    private ImageIcon getImageIcon(String path) {
+        ImageIcon icon = new ImageIcon(getImage(path));
+        Image img = icon.getImage();
+        Image newimg = img.getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+        icon = new ImageIcon(newimg);
+        return icon;
     }
 
     private void restartFlagsCounter() {
@@ -134,6 +183,7 @@ public class BoardPanel extends JPanel {
                 if (board.isWin()) {
                     timer.stop();
                     board.reveal();
+                    resetButton.setIcon(upsetIcon);
                     showMessageDialog("Win");
                 }
             } else {
@@ -141,6 +191,7 @@ public class BoardPanel extends JPanel {
                 if (board.isMine(i, j)) {
                     timer.stop();
                     board.reveal();
+                    resetButton.setIcon(sadIcon);
                     showMessageDialog("Loose");
                 }
             }
