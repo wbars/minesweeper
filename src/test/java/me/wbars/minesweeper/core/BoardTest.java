@@ -34,6 +34,7 @@ public class BoardTest {
     @Test
     public void totalMinesCountShouldMatch() throws Exception {
         Board board = Board.create(5, 4, 6);
+        board.open(0, 0);
         int minesCount = 0;
         for (int i = 0; i < board.rows(); i++) {
             for (int j = 0; j < board.cols(); j++) {
@@ -77,6 +78,7 @@ public class BoardTest {
     @Test
     public void defaultStatePlaying() throws Exception {
         Board board = Board.create(5, 5, 15);
+        board.open(0, 0);
         assertThat(board.isWin(), is(false));
     }
 
@@ -125,6 +127,25 @@ public class BoardTest {
                 else assertThat(board.cellState(i, j), is(CLOSED));
             }
         }
+    }
 
+    @Test()
+    public void firstCellNotPlantedNTimes() throws Exception {
+        // 1/2^10 prob should be enough I guess
+        for (int i = 0; i < 10; i++) firstCellNotPlanted();
+    }
+
+    private void firstCellNotPlanted() {
+        Board board = Board.create(2, 2, 3);
+        board.open(0, 1);
+        int minesCount = 0;
+        for (int i = 0; i < board.rows(); i++) {
+            for (int j = 0; j < board.cols(); j++) {
+                if (board.isMine(i, j)) minesCount++;
+            }
+        }
+
+        assertThat(minesCount, is(3));
+        assertThat(board.isMine(0, 1), is(false));
     }
 }

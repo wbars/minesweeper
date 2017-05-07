@@ -41,7 +41,7 @@ public class Cell {
     }
 
     public enum State {
-        OPEN, CLOSED, FLAG, UNSURE;
+        OPEN, CLOSED, FLAG;
     }
 
     @Override

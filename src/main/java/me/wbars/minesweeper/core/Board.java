@@ -15,9 +15,10 @@ public class Board {
     private final int rows;
     private final int minesCount;
     private final Cell[][] cells;
+    private boolean init;
 
     public boolean isWin() {
-        return allIndexes().stream()
+        return allIndexes(null).stream()
                 .map(this::cell)
                 .filter(Cell::isMine)
                 .allMatch(p -> p.state() == Cell.State.FLAG);
@@ -26,6 +27,7 @@ public class Board {
     public void open(int i, int j) {
         Cell cell = cells[i][j];
         if (cell.state() == Cell.State.OPEN) throw new IllegalStateException();
+        if (!init) init(new Pair<>(i, j));
         if (cell.isMine()) {
             cell.state(Cell.State.OPEN);
             return;
@@ -49,16 +51,16 @@ public class Board {
     }
 
     private Board(int cols, int rows, int minesCount) {
+        if (minesCount > cols * rows) throw new IllegalArgumentException("Too many mines: " + minesCount);
         this.cols = cols;
         this.rows = rows;
         this.minesCount = minesCount;
         cells = new Cell[rows][cols];
         initCells(cols, rows);
-        initRandomMines();
     }
 
-    private void initRandomMines() {
-        getRandomIndexes(minesCount).forEach(this::plantMine);
+    private void initRandomMines(Pair<Integer, Integer> exceptPos) {
+        getRandomIndexes(minesCount, exceptPos).forEach(this::plantMine);
     }
 
     private Cell cell(Pair<Integer, Integer> position) {
@@ -81,15 +83,18 @@ public class Board {
                 .collect(toList());
     }
 
-    private List<Pair<Integer, Integer>> getRandomIndexes(int size) {
-        List<Pair<Integer, Integer>> allIndexes = allIndexes();
+    private List<Pair<Integer, Integer>> getRandomIndexes(int size, Pair<Integer, Integer> exceptPos) {
+        List<Pair<Integer, Integer>> allIndexes = allIndexes(exceptPos);
+        if (size > allIndexes.size())
+            throw new IllegalStateException("Not enough free cells for plant: " + allIndexes.size());
         shuffle(allIndexes);
         return allIndexes.subList(0, size);
     }
 
-    private List<Pair<Integer, Integer>> allIndexes() {
+    private List<Pair<Integer, Integer>> allIndexes(Pair<Integer, Integer> exceptPos) {
         return range(0, rows).boxed()
                 .flatMap(i -> range(0, cols).boxed().map(j -> new Pair<>(i, j)))
+                .filter(p -> !p.equals(exceptPos))
                 .collect(toList());
     }
 
@@ -102,8 +107,13 @@ public class Board {
     }
 
     public static Board create(int cols, int rows, int minesCount) {
-        if (minesCount > cols * rows) throw new IllegalArgumentException("Too many mines: " + minesCount);
         return new Board(cols, rows, minesCount);
+    }
+
+    private void init(Pair<Integer, Integer> exceptPos) {
+        if (init) throw new IllegalStateException();
+        initRandomMines(exceptPos);
+        init = true;
     }
 
     public int cols() {
