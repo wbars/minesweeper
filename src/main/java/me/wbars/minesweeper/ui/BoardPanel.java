@@ -20,6 +20,8 @@ public class BoardPanel extends JPanel {
     private final ImageIcon sadIcon = getImageIcon("images/sad.png");
     private final ImageIcon smileIcon = getImageIcon("images/smile.png");
     private final ImageIcon surpriseIcon = getImageIcon("images/surprised.png");
+    private final ImageIcon flagIcon = getImageIcon("images/flag.png");
+    private final ImageIcon mineIcon = getImageIcon("images/mine.png");
     private int rows;
     private int cols;
     private final int minesCount;
@@ -260,7 +262,7 @@ public class BoardPanel extends JPanel {
 
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             setDefaultStyles();
-            if (board.isFlag(row, column)) this.setText("F");
+            if (board.isFlag(row, column)) this.setIcon(flagIcon);
 
             if (!board.isOpen(row, column)) {
                 if (row == selectedRow && column == selectedCol) background = Color.gray;
@@ -270,6 +272,7 @@ public class BoardPanel extends JPanel {
 
             if (board.isMine(row, column)) {
                 background = Color.red;
+                this.setIcon(mineIcon);
                 return this;
             }
 
@@ -284,6 +287,7 @@ public class BoardPanel extends JPanel {
 
         private void setDefaultStyles() {
             this.setText("");
+            this.setIcon(null);
             this.setForeground(Color.MAGENTA);
             this.setHorizontalAlignment(JLabel.CENTER);
             this.setVerticalAlignment(JLabel.CENTER);
