@@ -49,7 +49,7 @@ public class Cli {
 
             if (action == 1 && board.isMine(row, col)) {
                 out.println("LOOSE");
-                board.reveal();
+                board.reveal(false);
                 out.print(board.toString());
                 return;
             }

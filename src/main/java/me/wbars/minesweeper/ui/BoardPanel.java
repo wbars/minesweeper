@@ -193,7 +193,7 @@ public class BoardPanel extends JPanel {
 
                 if (board.isWin()) {
                     timer.stop();
-                    board.reveal();
+                    board.reveal(false);
                     resetButton.setIcon(upsetIcon);
                     showMessageDialog("Win");
                 }
@@ -201,7 +201,7 @@ public class BoardPanel extends JPanel {
                 board.open(i, j);
                 if (board.isMine(i, j)) {
                     timer.stop();
-                    board.reveal();
+                    board.reveal(true);
                     resetButton.setIcon(sadIcon);
                     showMessageDialog("Loose");
                 }

@@ -165,10 +165,10 @@ public class Board {
         return cells[i][j].isMine();
     }
 
-    public void reveal() {
+    public void reveal(boolean showMines) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
-                cells[i][j].state(Cell.State.OPEN);
+                if (showMines || !isMine(i, j)) cells[i][j].state(Cell.State.OPEN);
             }
         }
     }
