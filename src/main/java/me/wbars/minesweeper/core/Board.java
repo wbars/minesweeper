@@ -38,6 +38,7 @@ public class Board {
         bfs.addLast(e);
         while (!bfs.isEmpty()) {
             Cell cell = bfs.pollFirst();
+            if (cell.state() == Cell.State.OPEN) continue;
             cell.state(Cell.State.OPEN);
 
             if (cell.minesCount() > 0) continue;
