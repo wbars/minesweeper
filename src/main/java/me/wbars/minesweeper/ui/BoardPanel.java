@@ -153,18 +153,27 @@ public class BoardPanel extends JPanel {
         }
         table.setColumnSelectionAllowed(false);
         table.setRowSelectionAllowed(false);
-        table.addMouseMotionListener(new MyMouseAdapter());
-        table.addMouseListener(new MyMouseAdapter());
         table.setDefaultRenderer(Object.class, new AttributiveCellRenderer());
+
+        table.addMouseMotionListener(new MyMouseAdapter((DefaultTableModel) table.getModel()));
+        table.addMouseListener(new MyMouseAdapter((DefaultTableModel) table.getModel()));
         return table;
     }
 
     public class MyMouseAdapter extends MouseMotionAdapter implements MouseListener {
+        private final DefaultTableModel model;
+
+        MyMouseAdapter(DefaultTableModel model) {
+            this.model = model;
+        }
 
         public void mouseMoved(MouseEvent e) {
+            if (selectedRow >= 0 && selectedCol >= 0) model.fireTableCellUpdated(selectedRow, selectedCol);
+
             selectedRow = table.rowAtPoint(e.getPoint());
             selectedCol = table.columnAtPoint(e.getPoint());
-            table.repaint();
+
+            model.fireTableCellUpdated(selectedRow, selectedCol);
         }
 
         @Override
